@@ -114,7 +114,7 @@ const distPath = path.join(__dirname, '../dist');
 app.use(express.static(distPath));
 
 // Catch-all for React Router (must be AFTER API routes)
-app.get('*', (req, res) => {
+app.get('(.*)', (req, res) => {
     // Check if the request is an API request that didn't match
     if (req.path.startsWith('/api')) {
         return res.status(404).json({ error: 'API endpoint not found' });
