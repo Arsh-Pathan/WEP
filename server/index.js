@@ -13,8 +13,9 @@ app.use(express.json());
 
 // Initialize SQLite Database
 async function initDb() {
+    const dbPath = process.env.DATABASE_URL || './wep_database.sqlite';
     const db = await open({
-        filename: './wep_database.sqlite',
+        filename: dbPath,
         driver: sqlite3.Database
     });
 
@@ -43,7 +44,7 @@ async function initDb() {
 
 const dbPromise = initDb();
 
-// Endpoints
+// API Endpoints
 app.post('/api/register', async (req, res) => {
     const db = await dbPromise;
     const { headName, contact, meetingPoint, members } = req.body;
@@ -108,7 +109,20 @@ app.get('/api/family/:familyId', async (req, res) => {
     }
 });
 
-const PORT = 5000;
-app.listen(PORT, () => {
-    console.log(`WEP Server running on http://localhost:${PORT}`);
+// Serve static files from the Vite build (for Production)
+const distPath = path.join(__dirname, '../dist');
+app.use(express.static(distPath));
+
+// Catch-all for React Router (must be AFTER API routes)
+app.get('*', (req, res) => {
+    // Check if the request is an API request that didn't match
+    if (req.path.startsWith('/api')) {
+        return res.status(404).json({ error: 'API endpoint not found' });
+    }
+    res.sendFile(path.join(distPath, 'index.html'));
+});
+
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, '0.0.0.0', () => {
+    console.log(`WEP Server running on port ${PORT}`);
 });

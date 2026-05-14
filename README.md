@@ -67,7 +67,25 @@ This Vite-powered application is the functional prototype, demonstrating how a s
 
 ---
 
-## 📦 Getting Started
+## 🐳 Docker Deployment
+
+The application is fully containerized for easy deployment.
+
+### 1. Build the Image
+```bash
+docker build -t wep-portal .
+```
+
+### 2. Run the Container
+```bash
+docker run -d -p 5000:5000 --name wep-app -v wep-data:/app/data wep-portal
+```
+- **Port:** The app will be accessible at `http://localhost:5000`.
+- **Persistence:** The SQLite database is stored in a Docker volume named `wep-data` to ensure your data isn't lost when the container stops.
+
+---
+
+## 📦 Getting Started (Manual)
 
 1. **Clone the repo:**
    ```bash
