@@ -1,4 +1,3 @@
-import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { QRCodeSVG } from 'qrcode.react';
 import { ArrowLeft, Printer, Info, Shirt, Pencil } from 'lucide-react';
@@ -8,6 +7,8 @@ import { useFamily } from '../context/FamilyContext';
 const QRCodes = () => {
   const navigate = useNavigate();
   const { familyData } = useFamily();
+
+  if (!familyData) return null;
 
   const printQRs = () => {
     window.print();

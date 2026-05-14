@@ -1,21 +1,30 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ShieldCheck, MapPin, Phone, User, AlertTriangle, CheckCircle } from 'lucide-react';
+import { MapPin, Phone, User, AlertTriangle, CheckCircle } from 'lucide-react';
 import { Button, Card } from '../components/ui';
 
+interface EmergencyProfile {
+  id: string;
+  name: string;
+  age: string;
+  relation: string;
+  status: string;
+  meetingPoint: string;
+  headName: string;
+  contact: string;
+}
+
 const Profile = () => {
-  const { memberId } = useParams();
+  const { memberId } = useParams<{ memberId: string }>();
   const navigate = useNavigate();
-  const [data, setData] = useState(null);
+  const [data, setData] = useState<EmergencyProfile | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Simulation: Retrieve data from localStorage
-    // In a real production app, this would be an API call to a backend
     const savedData = localStorage.getItem('wep_family_data');
     if (savedData) {
       const family = JSON.parse(savedData);
-      const member = family.members.find(m => m.id === memberId);
+      const member = family.members.find((m: any) => m.id === memberId);
       if (member) {
         setData({
           ...member,

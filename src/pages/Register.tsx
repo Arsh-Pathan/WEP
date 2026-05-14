@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
+import type { ChangeEvent, FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { User, Phone, MapPin, Users, ArrowRight, ArrowLeft, Plus, Trash2 } from 'lucide-react';
+import { User, Phone, MapPin, ArrowRight, ArrowLeft, Plus, Trash2 } from 'lucide-react';
 import { Button, Input, Card } from '../components/ui';
 import { useFamily } from '../context/FamilyContext';
 
@@ -15,14 +16,14 @@ const Register = () => {
     members: [{ name: '', age: '', relation: '' }],
   });
 
-  const handleInputChange = (e) => {
+  const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { id, value } = e.target;
     setFormData((prev) => ({ ...prev, [id]: value }));
   };
 
-  const handleMemberChange = (index, field, value) => {
+  const handleMemberChange = (index: number, field: string, value: string) => {
     const updatedMembers = [...formData.members];
-    updatedMembers[index][field] = value;
+    (updatedMembers[index] as any)[field] = value;
     setFormData((prev) => ({ ...prev, members: updatedMembers }));
   };
 
@@ -33,7 +34,7 @@ const Register = () => {
     }));
   };
 
-  const removeMember = (index) => {
+  const removeMember = (index: number) => {
     if (formData.members.length > 1) {
       setFormData((prev) => ({
         ...prev,
@@ -42,7 +43,7 @@ const Register = () => {
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
     if (step < 2) {
       setStep(step + 1);

@@ -1,4 +1,3 @@
-import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ShieldCheck, Users, Scan, MapPin } from 'lucide-react';
 import { Button } from '../components/ui';

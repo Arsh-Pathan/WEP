@@ -1,6 +1,31 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useContext, useState, useEffect } from 'react';
+import type { ReactNode } from 'react';
 
-const FamilyContext = createContext();
+interface Member {
+  id: string;
+  name: string;
+  age: string;
+  relation: string;
+  status: 'Safe' | 'Missing';
+}
+
+interface FamilyData {
+  id: string;
+  headName: string;
+  contact: string;
+  meetingPoint: string;
+  members: Member[];
+  registeredAt: string;
+}
+
+interface FamilyContextType {
+  familyData: FamilyData | null;
+  registerFamily: (data: any) => void;
+  updateMemberStatus: (memberId: string, status: 'Safe' | 'Missing') => void;
+  resetData: () => void;
+}
+
+const FamilyContext = createContext<FamilyContextType | undefined>(undefined);
 
 export const useFamily = () => {
   const context = useContext(FamilyContext);
@@ -10,8 +35,8 @@ export const useFamily = () => {
   return context;
 };
 
-export const FamilyProvider = ({ children }) => {
-  const [familyData, setFamilyData] = useState(() => {
+export const FamilyProvider = ({ children }: { children: ReactNode }) => {
+  const [familyData, setFamilyData] = useState<FamilyData | null>(() => {
     const saved = localStorage.getItem('wep_family_data');
     return saved ? JSON.parse(saved) : null;
   });
@@ -24,26 +49,29 @@ export const FamilyProvider = ({ children }) => {
     }
   }, [familyData]);
 
-  const registerFamily = (data) => {
+  const registerFamily = (data: any) => {
     setFamilyData({
       ...data,
       id: `FAM-${Date.now()}`,
       registeredAt: new Date().toISOString(),
-      members: data.members.map((m, index) => ({
+      members: data.members.map((m: any, index: number) => ({
         ...m,
         id: `MBR-${Date.now()}-${index}`,
-        status: 'Safe', // Default status
+        status: 'Safe',
       })),
     });
   };
 
-  const updateMemberStatus = (memberId, status) => {
-    setFamilyData((prev) => ({
-      ...prev,
-      members: prev.members.map((m) =>
-        m.id === memberId ? { ...m, status } : m
-      ),
-    }));
+  const updateMemberStatus = (memberId: string, status: 'Safe' | 'Missing') => {
+    setFamilyData((prev) => {
+      if (!prev) return null;
+      return {
+        ...prev,
+        members: prev.members.map((m) =>
+          m.id === memberId ? { ...m, status } : m
+        ),
+      };
+    });
   };
 
   const resetData = () => {

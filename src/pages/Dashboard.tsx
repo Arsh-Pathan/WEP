@@ -1,4 +1,3 @@
-import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ShieldCheck, MapPin, QrCode, LogOut, Search, User } from 'lucide-react';
 import { Button, Card } from '../components/ui';
@@ -7,6 +6,8 @@ import { useFamily } from '../context/FamilyContext';
 const Dashboard = () => {
   const navigate = useNavigate();
   const { familyData, resetData } = useFamily();
+
+  if (!familyData) return null;
 
   const handleLogout = () => {
     if (window.confirm('Are you sure you want to reset your family data? This action is permanent.')) {
