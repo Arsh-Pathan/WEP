@@ -5,6 +5,13 @@ import { Button } from '../components/ui';
 const Home = () => {
   const navigate = useNavigate();
 
+  const handleRescuerScan = () => {
+    const id = window.prompt('ENTER WEP-ID (e.g., MBR-123456789-0):');
+    if (id) {
+      navigate(`/profile/${id.trim()}`);
+    }
+  };
+
   return (
     <div className="flex flex-col items-center justify-center min-h-screen p-6">
       <div className="flex flex-col items-center text-center max-w-2xl">
@@ -37,7 +44,7 @@ const Home = () => {
             <p className="text-sm text-google-grey mb-4 text-center">
               Identify lost individuals and find their safe location.
             </p>
-            <Button variant="danger" className="w-full">
+            <Button variant="danger" className="w-full" onClick={handleRescuerScan}>
               Scan QR Code
             </Button>
           </div>
