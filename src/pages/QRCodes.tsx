@@ -1,12 +1,19 @@
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { QRCodeSVG } from 'qrcode.react';
-import { ArrowLeft, Printer, Info, Shirt, Pencil } from 'lucide-react';
-import { Button, Card } from '../components/ui';
+import { ArrowLeft, Printer, Info, Shirt, Pencil, Globe } from 'lucide-react';
+import { Button, Card, Input } from '../components/ui';
 import { useFamily } from '../context/FamilyContext';
 
 const QRCodes = () => {
   const navigate = useNavigate();
   const { familyData } = useFamily();
+  const [baseUrl, setBaseUrl] = useState(window.location.origin);
+
+  useEffect(() => {
+    // Attempt to auto-detect if the user is on a custom host
+    setBaseUrl(window.location.origin);
+  }, []);
 
   if (!familyData) return null;
 
@@ -27,6 +34,25 @@ const QRCodes = () => {
           <Printer size={18} className="mr-2" /> Print All
         </Button>
       </div>
+
+      {/* Hostname Helper for Mobile Testing */}
+      <Card className="mb-6 border-google-yellow bg-yellow-50 print:hidden">
+        <div className="flex gap-4 items-start">
+          <Globe className="text-google-yellow shrink-0 mt-1" size={24} />
+          <div className="w-full">
+            <h3 className="font-bold text-yellow-800 mb-1">Testing on Mobile?</h3>
+            <p className="text-xs text-yellow-700 mb-4 leading-relaxed">
+              If you are scanning with a phone, ensure the URL below matches your computer's <b>Network IP</b> (e.g., http://192.168.1.5:5173).
+            </p>
+            <Input 
+              value={baseUrl}
+              onChange={(e) => setBaseUrl(e.target.value)}
+              placeholder="http://YOUR-IP:5173"
+              className="bg-white border-google-yellow/30 text-xs"
+            />
+          </div>
+        </div>
+      </Card>
 
       {/* Instructions Card */}
       <Card className="mb-12 bg-blue-50 border-blue-200 print:hidden">
@@ -60,7 +86,7 @@ const QRCodes = () => {
             
             <div className="p-4 bg-white border-2 border-gray-100 rounded-xl mb-6 shadow-inner">
               <QRCodeSVG 
-                value={`${window.location.origin}/profile/${member.id}?d=${btoa(JSON.stringify({
+                value={`${baseUrl}/profile/${member.id}?d=${btoa(JSON.stringify({
                   n: member.name,
                   a: member.age,
                   r: member.relation,

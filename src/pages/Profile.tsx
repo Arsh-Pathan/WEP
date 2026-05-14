@@ -3,6 +3,8 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { MapPin, Phone, User, AlertTriangle, CheckCircle } from 'lucide-react';
 import { Button, Card } from '../components/ui';
 
+const API_BASE = 'http://localhost:5000/api';
+
 interface EmergencyProfile {
   id: string;
   name: string;
@@ -21,45 +23,36 @@ const Profile = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // 1. Check if data is embedded in the URL (Decentralized mode)
-    const params = new URLSearchParams(window.location.search);
-    const encodedData = params.get('d');
-
-    if (encodedData) {
-      try {
-        const decoded = JSON.parse(atob(encodedData));
-        setData({
-          id: memberId || 'UNKNOWN',
-          name: decoded.n,
-          age: decoded.a,
-          relation: decoded.r,
-          meetingPoint: decoded.m,
-          headName: decoded.h,
-          contact: decoded.c,
-          status: 'Unknown'
-        });
+    // 1. Fetch from Database
+    fetch(`${API_BASE}/profile/${memberId}`)
+      .then(res => res.json())
+      .then(dbData => {
+        if (!dbData.error) {
+          setData(dbData);
+          setLoading(false);
+        } else {
+          // 2. Fallback to URL data if DB fetch fails (Offline/Decentralized mode)
+          const params = new URLSearchParams(window.location.search);
+          const encodedData = params.get('d');
+          if (encodedData) {
+            const decoded = JSON.parse(atob(encodedData));
+            setData({
+              id: memberId || 'UNKNOWN',
+              name: decoded.n,
+              age: decoded.a,
+              relation: decoded.r,
+              meetingPoint: decoded.m,
+              headName: decoded.h,
+              contact: decoded.c,
+              status: 'Unknown'
+            });
+          }
+          setLoading(false);
+        }
+      })
+      .catch(() => {
         setLoading(false);
-        return;
-      } catch (e) {
-        console.error('Failed to decode QR data', e);
-      }
-    }
-
-    // 2. Fallback: Retrieve data from localStorage (Same-device mode)
-    const savedData = localStorage.getItem('wep_family_data');
-    if (savedData) {
-      const family = JSON.parse(savedData);
-      const member = family.members.find((m: any) => m.id === memberId);
-      if (member) {
-        setData({
-          ...member,
-          meetingPoint: family.meetingPoint,
-          headName: family.headName,
-          contact: family.contact
-        });
-      }
-    }
-    setLoading(false);
+      });
   }, [memberId]);
 
   if (loading) {
@@ -76,7 +69,7 @@ const Profile = () => {
       <div className="max-w-md mx-auto py-20 px-6 text-center">
         <AlertTriangle size={64} className="text-google-red mx-auto mb-6" />
         <h2 className="text-2xl font-bold mb-2">ID Not Found</h2>
-        <p className="text-google-grey mb-8">This QR code does not match any registered emergency profile in our local records.</p>
+        <p className="text-google-grey mb-8">This QR code does not match any registered emergency profile.</p>
         <Button onClick={() => navigate('/')} className="w-full">
           Return to Home
         </Button>
@@ -95,7 +88,6 @@ const Profile = () => {
       </div>
 
       <div className="space-y-6">
-        {/* ACTION CARD */}
         <Card className="border-2 border-google-blue bg-blue-50">
           <div className="flex gap-4 items-start">
             <div className="p-3 bg-google-blue text-white rounded-xl shadow-lg shadow-blue-200">
@@ -111,7 +103,6 @@ const Profile = () => {
           </div>
         </Card>
 
-        {/* FAMILY INFO */}
         <Card>
           <div className="flex items-center gap-3 mb-6">
             <User className="text-google-grey" size={20} />
@@ -132,14 +123,13 @@ const Profile = () => {
           </div>
         </Card>
 
-        {/* RESCUER ACKNOWLEDGEMENT */}
         <div className="pt-6">
           <Button 
             className="w-full h-16 text-lg font-black uppercase tracking-widest shadow-xl shadow-green-100" 
             variant="primary"
-            style={{ backgroundColor: '#34A853' }} // Google Green
+            style={{ backgroundColor: '#34A853' }}
             onClick={() => {
-              alert('Reunification process started. Family head will be notified via SMS (Simulation).');
+              alert('Reunification process started.');
             }}
           >
             <CheckCircle className="mr-3" size={24} /> I Have Found This Person
