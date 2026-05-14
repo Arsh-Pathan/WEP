@@ -60,9 +60,16 @@ const QRCodes = () => {
             
             <div className="p-4 bg-white border-2 border-gray-100 rounded-xl mb-6 shadow-inner">
               <QRCodeSVG 
-                value={`${window.location.origin}/profile/${member.id}`}
+                value={`${window.location.origin}/profile/${member.id}?d=${btoa(JSON.stringify({
+                  n: member.name,
+                  a: member.age,
+                  r: member.relation,
+                  m: familyData.meetingPoint,
+                  h: familyData.headName,
+                  c: familyData.contact
+                }))}`}
                 size={180}
-                level="H"
+                level="L"
                 includeMargin={true}
               />
             </div>

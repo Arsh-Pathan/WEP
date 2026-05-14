@@ -21,6 +21,31 @@ const Profile = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    // 1. Check if data is embedded in the URL (Decentralized mode)
+    const params = new URLSearchParams(window.location.search);
+    const encodedData = params.get('d');
+
+    if (encodedData) {
+      try {
+        const decoded = JSON.parse(atob(encodedData));
+        setData({
+          id: memberId || 'UNKNOWN',
+          name: decoded.n,
+          age: decoded.a,
+          relation: decoded.r,
+          meetingPoint: decoded.m,
+          headName: decoded.h,
+          contact: decoded.c,
+          status: 'Unknown'
+        });
+        setLoading(false);
+        return;
+      } catch (e) {
+        console.error('Failed to decode QR data', e);
+      }
+    }
+
+    // 2. Fallback: Retrieve data from localStorage (Same-device mode)
     const savedData = localStorage.getItem('wep_family_data');
     if (savedData) {
       const family = JSON.parse(savedData);
